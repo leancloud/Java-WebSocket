@@ -9,10 +9,10 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.java_websocket.WebSocketImpl;
-import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
+import com.avos.avoscloud.java_websocket.WebSocketImpl;
+import com.avos.avoscloud.java_websocket.client.DefaultSSLWebSocketClientFactory;
+import com.avos.avoscloud.java_websocket.client.WebSocketClient;
+import com.avos.avoscloud.java_websocket.handshake.ServerHandshake;
 
 class WebSocketChatClient extends WebSocketClient {
 

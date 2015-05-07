@@ -5,10 +5,10 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
 
-import org.java_websocket.WebSocket;
-import org.java_websocket.WebSocketImpl;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
+import com.avos.avoscloud.java_websocket.WebSocket;
+import com.avos.avoscloud.java_websocket.WebSocketImpl;
+import com.avos.avoscloud.java_websocket.handshake.ClientHandshake;
+import com.avos.avoscloud.java_websocket.server.WebSocketServer;
 
 /**
  * A simple WebSocketServer implementation. Keeps track of a "chatroom".

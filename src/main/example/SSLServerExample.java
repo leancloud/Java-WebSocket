@@ -8,8 +8,8 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.java_websocket.WebSocketImpl;
-import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
+import com.avos.avoscloud.java_websocket.WebSocketImpl;
+import com.avos.avoscloud.java_websocket.server.DefaultSSLWebSocketServerFactory;
 
 public class SSLServerExample {
 

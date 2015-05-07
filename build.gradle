@@ -19,7 +19,7 @@ configurations {
 
 configure(install.repositories.mavenInstaller) {
     pom.version = project.version
-    pom.groupId = "org.java_websocket"
+    pom.groupId = "cn.leancloud.android"
     pom.artifactId = 'Java-WebSocket'
 }
 

@@ -4,14 +4,14 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.ByteBuffer;
 
-import org.java_websocket.WebSocket;
-import org.java_websocket.WebSocketImpl;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.drafts.Draft;
-import org.java_websocket.drafts.Draft_17;
-import org.java_websocket.framing.FrameBuilder;
-import org.java_websocket.framing.Framedata;
-import org.java_websocket.handshake.ServerHandshake;
+import com.avos.avoscloud.java_websocket.WebSocket;
+import com.avos.avoscloud.java_websocket.WebSocketImpl;
+import com.avos.avoscloud.java_websocket.client.WebSocketClient;
+import com.avos.avoscloud.java_websocket.drafts.Draft;
+import com.avos.avoscloud.java_websocket.drafts.Draft_17;
+import com.avos.avoscloud.java_websocket.framing.FrameBuilder;
+import com.avos.avoscloud.java_websocket.framing.Framedata;
+import com.avos.avoscloud.java_websocket.handshake.ServerHandshake;
 
 public class AutobahnClientTest extends WebSocketClient {
 
