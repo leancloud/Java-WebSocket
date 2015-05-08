@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.leancloud.android</groupId>
     <artifactId>Java-WebSocket</artifactId>
-    <version>1.2.1-leancloud-SNAPSHOT</version>
+    <version>1.2.1-leancloud</version>
     <packaging>jar</packaging>
     <name>Java WebSocket</name>
     <description>A barebones WebSocket client and server implementation written in 100% Java</description>
@@ -61,9 +61,9 @@
             <id>snapshots</id>
             <url>http://mvn.leancloud.cn/nexus/content/repositories/snapshots/</url>
         </repository>
-        <!--<snapshotRepository>-->
-            <!--<id>releases</id>-->
-            <!--<url>http://mvn.leancloud.cn/nexus/content/repositories/releases/</url>-->
-        <!--</snapshotRepository>-->
+        <snapshotRepository>
+            <id>releases</id>
+            <url>http://mvn.leancloud.cn/nexus/content/repositories/releases/</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>
