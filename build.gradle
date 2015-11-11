@@ -8,8 +8,8 @@ repositories {
     mavenCentral()
 }
 
-group = 'org.java_websocket'
-version = '1.2.1-SNAPSHOT'
+group = 'cn.leancloud.android'
+version = '1.3.1-SNAPSHOT'
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
@@ -19,7 +19,7 @@ configurations {
 
 configure(install.repositories.mavenInstaller) {
     pom.version = project.version
-    pom.groupId = "org.java_websocket"
+    pom.groupId = "cn.leancloud.android"
     pom.artifactId = 'Java-WebSocket'
 }
 
