@@ -665,7 +665,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	}
 
 	/**
-	 * @see WebSocket#sendFragmentedFrame(org.java_websocket.framing.Framedata.Opcode, ByteBuffer, boolean)
+	 * @see WebSocket#sendFragmentedFrame(com.avos.avoscloud.java_websocket.framing.Framedata.Opcode, ByteBuffer, boolean)
 	 */
 	public void onFragment( WebSocket conn, Framedata fragment ) {
 	}

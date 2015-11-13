@@ -36,9 +36,9 @@ The ant targets are: ```compile```, ```jar```, ```doc``` and ```clean```
 To use maven just add this dependency to your pom.xml:
 ```xml
 <dependency>
-    <groupId>org.java-websocket</groupId>
+    <groupId>cn.leancloud.android</groupId>
     <artifactId>Java-WebSocket</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.1-leancloud</version>
 </dependency> 
 ```
 
@@ -73,7 +73,7 @@ implementation will be used, otherwise it will fall back to a
 Writing your own WebSocket Server
 ---------------------------------
 
-The `org.java_websocket.server.WebSocketServer` abstract class implements the
+The `com.avos.avoscloud.java_websocket.server.WebSocketServer` abstract class implements the
 server-side of the
 [WebSocket Protocol](http://www.whatwg.org/specs/web-socket-protocol/).
 A WebSocket server by itself doesn't do anything except establish socket
@@ -83,7 +83,7 @@ connections though HTTP. After that it's up to **your** subclass to add purpose.
 Writing your own WebSocket Client
 ---------------------------------
 
-The `org.java_websocket.client.WebSocketClient` abstract class can connect to
+The `com.avos.avoscloud.java_websocket.client.WebSocketClient` abstract class can connect to
 valid WebSocket servers. The constructor expects a valid `ws://` URI to
 connect to. Important events `onOpen`, `onClose`, `onMessage` and `onIOError` 
 get fired throughout the life of the WebSocketClient, and must be implemented 
