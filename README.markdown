@@ -42,6 +42,18 @@ To use maven just add this dependency to your pom.xml:
 </dependency> 
 ```
 
+local install:
+
+```
+mvn -Dmaven.test.skip=true install
+```
+
+mvn deploy:
+
+```
+mvn -Dmaven.test.skip=true deploy
+```
+
 Running the Examples
 -------------------
 
