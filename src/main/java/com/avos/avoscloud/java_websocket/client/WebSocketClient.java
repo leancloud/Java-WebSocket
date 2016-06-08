@@ -1,17 +1,5 @@
 package com.avos.avoscloud.java_websocket.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.Socket;
-import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.channels.NotYetConnectedException;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
 import com.avos.avoscloud.java_websocket.WebSocket;
 import com.avos.avoscloud.java_websocket.WebSocketAdapter;
 import com.avos.avoscloud.java_websocket.WebSocketImpl;
@@ -24,6 +12,18 @@ import com.avos.avoscloud.java_websocket.handshake.HandshakeImpl1Client;
 import com.avos.avoscloud.java_websocket.handshake.Handshakedata;
 import com.avos.avoscloud.java_websocket.handshake.ServerHandshake;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Socket;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.channels.NotYetConnectedException;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
 /**
  * A subclass must implement at least <var>onOpen</var>, <var>onClose</var>, and <var>onMessage</var> to be
  * useful. At runtime the user is expected to establish a connection via {@link #connect()}, then receive events like {@link #onMessage(String)} via the overloaded methods and to {@link #send(String)} data to the server.
@@ -35,7 +35,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 */
 	protected URI uri = null;
 
-	private WebSocketImpl engine = null;
+	private transient WebSocketImpl engine = null;
 
 	private Socket socket = null;
 
@@ -46,6 +46,8 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	private Proxy proxy = Proxy.NO_PROXY;
 
 	private Thread writeThread;
+
+    private Thread readThread;
 
 	private Draft draft;
 
@@ -103,10 +105,17 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * Initiates the websocket connection. This method does not block.
 	 */
 	public void connect() {
-		if( writeThread != null )
-			throw new IllegalStateException( "WebSocketClient objects are not reuseable" );
-		writeThread = new Thread( this );
-		writeThread.start();
+	   if(isOpen()||isConnecting()){
+		 return;
+	   }else{
+		 if(writeThread!=null){
+		   writeThread.interrupt();
+		   readThread.interrupt();
+		   this.draft = draft.copyInstance();
+		   this.engine = new WebSocketImpl( this,this.draft);
+		 }
+		 new Thread(this).start();
+	   }
 	}
 
 	/**
@@ -136,7 +145,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 
 	/**
 	 * Sends <var>text</var> to the connected websocket server.
-	 * 
+	 *
 	 * @param text
 	 *            The string which will be transmitted.
 	 */
@@ -146,7 +155,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 
 	/**
 	 * Sends binary <var> data</var> to the connected webSocket server.
-	 * 
+	 *
 	 * @param data
 	 *            The byte-Array of data to send to the WebSocket server.
 	 */
@@ -156,10 +165,8 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 
 	public void run() {
 		try {
-			if( socket == null ) {
+			if( socket == null ||  socket.isClosed()) {
 				socket = new Socket( proxy );
-			} else if( socket.isClosed() ) {
-				throw new IOException();
 			}
 			if( !socket.isBound() )
 				socket.connect( new InetSocketAddress( uri.getHost(), getPort() ), connectTimeout );
@@ -173,25 +180,11 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 			return;
 		}
 
-		writeThread = new Thread( new WebsocketWriteThread() );
+		writeThread = new Thread( new WebSocketWriteThread(engine,ostream));
 		writeThread.start();
 
-		byte[] rawbuffer = new byte[ WebSocketImpl.RCVBUF ];
-		int readBytes;
-
-		try {
-			while ( !isClosed() && ( readBytes = istream.read( rawbuffer ) ) != -1 ) {
-				engine.decode( ByteBuffer.wrap( rawbuffer, 0, readBytes ) );
-			}
-			engine.eot();
-		} catch ( IOException e ) {
-			engine.eot();
-		} catch ( RuntimeException e ) {
-			// this catch case covers internal errors only and indicates a bug in this websocket implementation
-			onError( e );
-			engine.closeConnection( CloseFrame.ABNORMAL_CLOSE, e.getMessage() );
-		}
-		assert ( socket.isClosed() );
+	    readThread = new Thread(new WebSocketReadThread(this,engine,istream));
+	    readThread.start();
 	}
 	private int getPort() {
 		int port = uri.getPort();
@@ -226,7 +219,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 		handshake.put( "Host", host );
 		if( headers != null ) {
 			for( Map.Entry<String,String> kv : headers.entrySet() ) {
-				handshake.put( kv.getKey(), kv.getValue() );
+				handshake.put(kv.getKey(), kv.getValue() );
 			}
 		}
 		engine.startHandshake( handshake );
@@ -341,23 +334,6 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	public void onFragment( Framedata frame ) {
 	}
 
-	private class WebsocketWriteThread implements Runnable {
-		@Override
-		public void run() {
-			Thread.currentThread().setName( "WebsocketWriteThread" );
-			try {
-				while ( !Thread.interrupted() ) {
-					ByteBuffer buffer = engine.outQueue.take();
-					ostream.write( buffer.array(), 0, buffer.limit() );
-					ostream.flush();
-				}
-			} catch ( IOException e ) {
-				engine.eot();
-			} catch ( InterruptedException e ) {
-				// this thread is regularly terminated via an interrupt
-			}
-		}
-	}
 
 	public void setProxy( Proxy proxy ) {
 		if( proxy == null )
@@ -445,7 +421,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	public InetSocketAddress getRemoteSocketAddress() {
 		return engine.getRemoteSocketAddress();
 	}
-	
+
 	@Override
 	public String getResourceDescriptor() {
 		return uri.getPath();

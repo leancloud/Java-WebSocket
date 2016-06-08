@@ -1,18 +1,5 @@
 package com.avos.avoscloud.java_websocket;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
-import java.nio.channels.NotYetConnectedException;
-import java.nio.channels.SelectionKey;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import com.avos.avoscloud.java_websocket.drafts.Draft;
 import com.avos.avoscloud.java_websocket.drafts.Draft.CloseHandshakeType;
 import com.avos.avoscloud.java_websocket.drafts.Draft.HandshakeState;
@@ -35,6 +22,19 @@ import com.avos.avoscloud.java_websocket.handshake.ServerHandshake;
 import com.avos.avoscloud.java_websocket.handshake.ServerHandshakeBuilder;
 import com.avos.avoscloud.java_websocket.server.WebSocketServer.WebSocketWorker;
 import com.avos.avoscloud.java_websocket.util.Charsetfunctions;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.ByteChannel;
+import java.nio.channels.NotYetConnectedException;
+import java.nio.channels.SelectionKey;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Represents one end (client or server) of a single WebSocketImpl connection.
@@ -462,17 +462,17 @@ public class WebSocketImpl implements WebSocket {
 				wsl.onWebsocketError( this, e );
 			}
 		}
-		try {
-			this.wsl.onWebsocketClose( this, code, message, remote );
-		} catch ( RuntimeException e ) {
-			wsl.onWebsocketError( this, e );
-		}
 		if( draft != null )
 			draft.reset();
 		handshakerequest = null;
 
 		readystate = READYSTATE.CLOSED;
 		this.outQueue.clear();
+	  	try {
+			this.wsl.onWebsocketClose( this, code, message, remote );
+	  	} catch ( RuntimeException e ) {
+			wsl.onWebsocketError( this, e );
+	  	}
 	}
 
 	protected void closeConnection( int code, boolean remote ) {
@@ -512,7 +512,9 @@ public class WebSocketImpl implements WebSocket {
 	}
 
 	public void eot() {
-		if( getReadyState() == READYSTATE.NOT_YET_CONNECTED ) {
+	    if(getReadyState()==READYSTATE.CLOSED){
+		  return;
+		}else if( getReadyState() == READYSTATE.NOT_YET_CONNECTED ) {
 			closeConnection( CloseFrame.NEVER_CONNECTED, true );
 		} else if( flushandclosestate ) {
 			closeConnection( closecode, closemessage, closedremotely );
